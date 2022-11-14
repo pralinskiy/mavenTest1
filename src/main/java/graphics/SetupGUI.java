@@ -5,10 +5,7 @@ import server.Server;
 import server.Setup;
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 public final class SetupGUI extends JFrame{
     JButton buttonServer = new JButton("server");
@@ -16,18 +13,35 @@ public final class SetupGUI extends JFrame{
     JPanel panelButtons = new JPanel(new FlowLayout());
     public Setup setup;
 
+
+    JTextArea console = new JTextArea();
+
+
+
     public SetupGUI() {
-        this.setSize(320,320);
+        this.setLayout(new BorderLayout());
+
+        this.setSize(500,320);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
 
         this.initButtons();
+        this.initConsole();
 
+        this.setResizable(false);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
 
-        this.pack();
+        //this.pack();
     }
+
+
+    private void initConsole() {
+        console.setEditable(false);
+
+        this.add(new JScrollPane(console), BorderLayout.CENTER);
+    }
+
 
     private void initButtons() {
         buttonClient.setFocusable(false);
@@ -78,7 +92,7 @@ public final class SetupGUI extends JFrame{
             }
         });
 
-        this.add(panelButtons, BorderLayout.CENTER);
+        this.add(panelButtons, BorderLayout.NORTH);
     }
 
     public static void main(String[] args) {

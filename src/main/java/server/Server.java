@@ -7,6 +7,7 @@ import connection.MessageType;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,10 @@ public class Server {
     private ServerSocket serverSocket;
     private HashMap<Connection, String> clients = new HashMap<>();
     public Setup setup = new Setup(8888);
+
+
+    ArrayList<String> chatAllMessages = new ArrayList<String>();
+
 
     public Server(String port) {
 
@@ -44,11 +49,12 @@ public class Server {
         for(Map.Entry<Connection, String> client : clients.entrySet()) {
             client.getKey().send(new Message(MessageType.TEXT, /*client.getValue() +*/ message.message + "\n"));
         }
+        chatAllMessages.add(message.message);
     }
 
-    private void sendUsersListToAllUsers(Message message) throws IOException {
+    private void sendUsersListToAllUsers() throws IOException {
         for(Map.Entry<Connection, String> client : clients.entrySet()) {
-            client.getKey().send(new Message(MessageType.USER_HAS_JOINED, getUsersList()));
+            client.getKey().send(new Message(MessageType.USERS_LIST_UPDATE, getUsersList()));
         }
     }
 
@@ -68,15 +74,15 @@ public class Server {
         String id;
         Connection connection;
 
-        public ServerThread(Socket socket) throws IOException {
+        public ServerThread(Socket socket) throws IOException, ClassNotFoundException {
             this.socketInThread = socket;
             id = Arrays.toString(socketInThread.getInetAddress().getAddress());
-            name = id;
             connection = new Connection(this.socketInThread);
-            clients.put(connection, name);
             //connection.send(new Message(MessageType.ACCEPTED));
-            sendMessageToAllUsers(new Message(MessageType.TEXT, name + " has joined\n"));
-            sendUsersListToAllUsers(new Message(MessageType.USERS_LIST_UPDATE, getUsersList()));
+            sendMessageToAllUsers(new Message(MessageType.TEXT, sendRequestNameChange() + " has joined\n"));
+            connection.send(new Message(MessageType.TEXT, getChatAllMessages()));
+            clients.put(connection, name);
+            sendUsersListToAllUsers();
             this.start();
         }
 
@@ -103,7 +109,7 @@ public class Server {
                     //connection.close();
                     //this.connection.close();
                     sendMessageToAllUsers(new Message(MessageType.TEXT, this.name + " has left"));
-                    sendUsersListToAllUsers(new Message(MessageType.USERS_LIST_UPDATE, getUsersList()));
+                    sendUsersListToAllUsers();
                     connection.send(new Message(MessageType.ACCEPTED));
                     this.connection.close();
                     break;
@@ -111,13 +117,28 @@ public class Server {
                 else if(message.messageType.equals(MessageType.NAME_CHANGE)) {
                     clients.replace(connection, clients.get(connection), message.message);
                     this.name = clients.get(connection);
-                    sendUsersListToAllUsers(new Message(MessageType.USERS_LIST_UPDATE, getUsersList()));
+                    sendUsersListToAllUsers();
                 }
 
             }
         }
 
+        private String sendRequestNameChange() throws IOException, ClassNotFoundException {
+            connection.send(new Message(MessageType.NAME_CHANGE));
+            Message messageWithName = connection.receive();
+            if(messageWithName.messageType.equals(MessageType.NAME_CHANGE)) {
+                this.name = messageWithName.message;
+            }
+            return this.name;
+        }
 
+        private String getChatAllMessages() {
+            String allMessages = "";
+            for(String message : chatAllMessages) {
+                allMessages += message + '\n';
+            }
+            return allMessages;
+        }
     }
 
 }

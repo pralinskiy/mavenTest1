@@ -5,6 +5,7 @@ import server.Setup;
 import connection.Connection;
 import connection.Message;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.*;
 
@@ -20,7 +21,18 @@ public final class Client {
     }
     private void connectToServer(Setup setup) throws IOException, ClassNotFoundException {
         connection = new Connection(new Socket(setup.adressIP, setup.port));
+
+        Message messageNameChange = connection.receive();
+        if(messageNameChange.messageType.equals(MessageType.NAME_CHANGE)) {
+            responseNameChange();
+        }
+
+        //connection.send(new Message(MessageType.NAME_CHANGE, JOptionPane.showInputDialog("Введите имя")));
         //return connection.receive().messageType.equals(MessageType.ACCEPTED);
+    }
+
+    private void responseNameChange() throws IOException {
+        connection.send(new Message(MessageType.NAME_CHANGE, JOptionPane.showInputDialog("введите имя")));
     }
 
     private void startChat(Connection connection) throws IOException, ClassNotFoundException {
