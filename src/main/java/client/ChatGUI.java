@@ -48,7 +48,7 @@ public class ChatGUI extends JFrame {
 
         usersList.setSize(200, this.HEIGHT);
         usersList.setLineWrap(true);
-        usersList.setBackground(Color.gray);
+        usersList.setBackground(Color.YELLOW);
         usersList.setEditable(false);
 
         panelSouth.add(textInput);

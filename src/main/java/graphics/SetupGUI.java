@@ -17,7 +17,6 @@ public final class SetupGUI extends JFrame{
     JTextArea console = new JTextArea();
 
 
-
     public SetupGUI() {
         this.setLayout(new BorderLayout());
 
