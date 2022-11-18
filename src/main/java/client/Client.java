@@ -37,7 +37,7 @@ public final class Client {
 
     private void startChat(Connection connection) throws IOException, ClassNotFoundException {
 
-        while(!connection.socket.isClosed()) {
+        while(!this.connection.socket.isClosed()) {
             Message message = this.connection.receive();
 
             if(message.messageType.equals(MessageType.TEXT)) {

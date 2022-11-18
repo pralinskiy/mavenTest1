@@ -5,7 +5,10 @@ import connection.MessageType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.security.Key;
 
 public class ChatGUI extends JFrame {
     private static final int GUI_WIDTH = 500;
@@ -92,6 +95,22 @@ public class ChatGUI extends JFrame {
                     ex.printStackTrace();
                 }
             }
+        });
+        textInput.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) { }
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    try {
+                        client.connection.send(new Message(MessageType.TEXT, textInput.getText()));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            @Override
+            public void keyReleased(KeyEvent e) { }
         });
     }
 

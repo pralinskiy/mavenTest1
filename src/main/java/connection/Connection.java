@@ -19,14 +19,14 @@ public class Connection implements Closeable {
     }
 
     public void send(Message message) throws IOException {
-        /*synchronized (this.out)*/ {
+        {
             this.out.writeObject(message);
         }
     }
 
     public Message receive() throws IOException, ClassNotFoundException {
-        /*synchronized (this.in)*/ {
-            return (Message) this.in.readObject();
+        {
+            return (Message)this.in.readObject();
         }
     }
 
