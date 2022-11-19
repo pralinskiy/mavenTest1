@@ -81,7 +81,7 @@ public final class SetupGUI extends JFrame{
                 try
                 {
                     new Thread(() -> {
-                        new Server(JOptionPane.showInputDialog("введите port"));
+                        new Server(JOptionPane.showInputDialog("введите port"), this);
                     }).start();
                 }
                 catch (Exception ex)
@@ -93,6 +93,12 @@ public final class SetupGUI extends JFrame{
 
         this.add(panelButtons, BorderLayout.NORTH);
     }
+
+
+    public void consoleLog(String consoleMessage) {
+        console.append(consoleMessage + '\n');
+    }
+
 
     public static void main(String[] args) {
         new SetupGUI();

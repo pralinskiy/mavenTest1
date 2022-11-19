@@ -3,6 +3,7 @@ package server;
 import connection.Connection;
 import connection.Message;
 import connection.MessageType;
+import graphics.SetupGUI;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -18,19 +19,24 @@ public class Server {
     public Setup setup = new Setup(8888);
 
 
+    SetupGUI setupGUI;
+
+
     ArrayList<String> chatAllMessages = new ArrayList<String>();
 
 
-    public Server(String port) {
+    public Server(String port, SetupGUI setupGUI) {
 
+        this.setupGUI = setupGUI;
         this.setup.port = Integer.parseInt(port);
+
         this.initServer();
     }
     private void initServer() {
         try
         {
             serverSocket = new ServerSocket(this.setup.port);
-
+            setupGUI.consoleLog("Port has opened! ");
             enableConnections();
         }
         catch (IOException | ClassNotFoundException e)
@@ -39,6 +45,7 @@ public class Server {
         }
     }
     private void enableConnections() throws IOException, ClassNotFoundException {
+        setupGUI.consoleLog("Server has started");
         while(true) {
             Socket socket = serverSocket.accept();
             new ServerThread(socket);
@@ -46,6 +53,7 @@ public class Server {
     }
 
     private void sendMessageToAllUsers(Message message) throws IOException {
+        setupGUI.consoleLog("All users got -> " + message.message);
         for(Map.Entry<Connection, String> client : clients.entrySet()) {
             client.getKey().send(new Message(MessageType.TEXT, /*client.getValue() +*/ message.message + "\n"));
         }
@@ -53,6 +61,7 @@ public class Server {
     }
 
     private void sendUsersListToAllUsers() throws IOException {
+        setupGUI.consoleLog("User list updated");
         for(Map.Entry<Connection, String> client : clients.entrySet()) {
             client.getKey().send(new Message(MessageType.USERS_LIST_UPDATE, getUsersList()));
         }
@@ -78,8 +87,9 @@ public class Server {
             this.socketInThread = socket;
             id = Arrays.toString(socketInThread.getInetAddress().getAddress());
             connection = new Connection(this.socketInThread);
+            setupGUI.consoleLog("Client " + id + " has connected");
             //connection.send(new Message(MessageType.ACCEPTED));
-            sendMessageToAllUsers(new Message(MessageType.TEXT, sendRequestNameChange() + " has joined\n"));
+            sendMessageToAllUsers(new Message(MessageType.TEXT, '\n' + sendRequestNameChange() + " has joined\n"));
             connection.send(new Message(MessageType.TEXT, getChatAllMessages()));
             clients.put(connection, name);
             sendUsersListToAllUsers();
@@ -92,7 +102,7 @@ public class Server {
             {
                 startClientsChat(connection);
             }
-            catch (IOException | ClassNotFoundException e) { e.printStackTrace(); }
+            catch (IOException | ClassNotFoundException e) { setupGUI.consoleLog(e.getMessage()); }
 
         }
 
@@ -108,7 +118,8 @@ public class Server {
                     clients.remove(connection);
                     //connection.close();
                     //this.connection.close();
-                    sendMessageToAllUsers(new Message(MessageType.TEXT, this.name + " has left"));
+                    setupGUI.consoleLog("Client " + id + " has disconnected");
+                    sendMessageToAllUsers(new Message(MessageType.TEXT, '\n' + this.name + " has left\n"));
                     sendUsersListToAllUsers();
                     connection.send(new Message(MessageType.ACCEPTED));
                     this.connection.close();

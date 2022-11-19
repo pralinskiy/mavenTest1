@@ -10,7 +10,7 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.security.Key;
 
-public class ChatGUI extends JFrame {
+public class ChatGUI extends JFrame implements KeyListener {
     private static final int GUI_WIDTH = 500;
     private static final int GUI_HEIGHT = 500;
 
@@ -96,22 +96,7 @@ public class ChatGUI extends JFrame {
                 }
             }
         });
-        textInput.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) { }
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    try {
-                        client.connection.send(new Message(MessageType.TEXT, textInput.getText()));
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-            @Override
-            public void keyReleased(KeyEvent e) { }
-        });
+        textInput.addKeyListener(this);
     }
 
     public void refreshDialog(Message message) {
@@ -125,4 +110,19 @@ public class ChatGUI extends JFrame {
     //public static void main(String[] args) throws IOException {
     //    new ChatGUI();
     //}
+
+    @Override
+    public void keyTyped(KeyEvent e) { }
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+            try {
+                client.connection.send(new Message(MessageType.TEXT, textInput.getText()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    @Override
+    public void keyReleased(KeyEvent e) { }
 }

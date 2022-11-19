@@ -6,7 +6,8 @@ public enum MessageType {
     USER_HAS_JOINED,
     USER_HAS_LEFT,
     ACCEPTED,
-    USERS_LIST_UPDATE
+    USERS_LIST_UPDATE,
+    CONSOLE
 
 
 }
