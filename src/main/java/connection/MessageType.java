@@ -7,7 +7,8 @@ public enum MessageType {
     USER_HAS_LEFT,
     ACCEPTED,
     USERS_LIST_UPDATE,
-    CONSOLE
+    CONSOLE,
+    IMAGE,
 
 
 }

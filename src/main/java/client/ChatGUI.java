@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.security.Key;
 
 public class ChatGUI extends JFrame implements KeyListener {
     private static final int GUI_WIDTH = 500;
@@ -23,6 +22,10 @@ public class ChatGUI extends JFrame implements KeyListener {
     JButton buttonChangeName = new JButton("name");
     JButton buttonStopChatting = new JButton("stop");
     Client client;
+
+    JButton buttonGetFIle = new JButton("upload file");
+
+    //JPanel imagePanel = new JPanel();
 
     public ChatGUI(Client client) {
         super(client.toString());
@@ -58,11 +61,17 @@ public class ChatGUI extends JFrame implements KeyListener {
         panelSouthHelp.add(buttonSendMessage);
         panelSouthHelp.add(buttonChangeName);
         panelSouthHelp.add(buttonStopChatting);
+        panelSouthHelp.add(buttonGetFIle);
         panelSouth.add(panelSouthHelp);
+
+
+        //textOutput.add(imagePanel);
+
 
         this.add(new JScrollPane(textOutput), BorderLayout.CENTER);
         this.add(new JScrollPane(usersList), BorderLayout.EAST);
         this.add(panelSouth, BorderLayout.SOUTH);
+
     }
 
     private void initActionListeners() {
@@ -96,6 +105,19 @@ public class ChatGUI extends JFrame implements KeyListener {
                 }
             }
         });
+
+        buttonGetFIle.addActionListener(e -> {
+            if(e.getSource() == buttonGetFIle) {
+                try {
+                    client.getImageFromSystem();
+                    client.connection.send(new Message(MessageType.IMAGE, client.fileReader.image));
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
         textInput.addKeyListener(this);
     }
 
@@ -106,6 +128,12 @@ public class ChatGUI extends JFrame implements KeyListener {
     public void refreshUsersList(Message message) {
         this.usersList.setText(message.message);
     }
+
+
+    //public void addImageToTextDialog(FileReader fr) {
+    //    this.imagePanel.add;
+    //}
+
 
     //public static void main(String[] args) throws IOException {
     //    new ChatGUI();

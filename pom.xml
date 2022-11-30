@@ -23,7 +23,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass> graphics.SetupGUI</mainClass>
+                            <mainClass>setup.SetupGUI</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

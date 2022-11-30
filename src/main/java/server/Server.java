@@ -3,7 +3,7 @@ package server;
 import connection.Connection;
 import connection.Message;
 import connection.MessageType;
-import graphics.SetupGUI;
+import setup.SetupGUI;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -107,38 +107,54 @@ public class Server {
         }
 
         private void startClientsChat(Connection connection) throws IOException, ClassNotFoundException {
+            try {
+                while(true) {
+                    Message message = this.connection.receive();
 
-            while(true) {
-                Message message = this.connection.receive();
+                    if(message.messageType.equals(MessageType.TEXT)) {
+                        sendMessageToAllUsers(new Message(MessageType.TEXT, this.name + ": " + message.message));
+                    }
+                    else if(message.messageType.equals(MessageType.USER_HAS_LEFT)) {
+                        clients.remove(connection);
+                        //connection.close();
+                        //this.connection.close();
+                        setupGUI.consoleLog("Client " + id + " has disconnected");
+                        sendMessageToAllUsers(new Message(MessageType.TEXT, '\n' + this.name + " has left\n"));
+                        sendUsersListToAllUsers();
+                        connection.send(new Message(MessageType.ACCEPTED));
+                        this.connection.close();
+                        break;
+                    }
+                    else if(message.messageType.equals(MessageType.NAME_CHANGE)) {
+                        clients.replace(connection, clients.get(connection), message.message);
+                        this.name = clients.get(connection);
+                        sendUsersListToAllUsers();
+                    }
+                    else  if(message.messageType.equals((MessageType.CONSOLE))) {
+                        setupGUI.consoleLog(message.message);
+                    }
+                    else if(message.messageType.equals(MessageType.IMAGE)) {
+                        sendMessageToAllUsers(new Message(MessageType.IMAGE, this.name + ": " + message.image));
+                    }
 
-                if(message.messageType.equals(MessageType.TEXT)) {
-                    sendMessageToAllUsers(new Message(MessageType.TEXT, this.name + ": " + message.message));
                 }
-                else if(message.messageType.equals(MessageType.USER_HAS_LEFT)) {
-                    clients.remove(connection);
-                    //connection.close();
-                    //this.connection.close();
-                    setupGUI.consoleLog("Client " + id + " has disconnected");
-                    sendMessageToAllUsers(new Message(MessageType.TEXT, '\n' + this.name + " has left\n"));
-                    sendUsersListToAllUsers();
-                    connection.send(new Message(MessageType.ACCEPTED));
-                    this.connection.close();
-                    break;
-                }
-                else if(message.messageType.equals(MessageType.NAME_CHANGE)) {
-                    clients.replace(connection, clients.get(connection), message.message);
-                    this.name = clients.get(connection);
-                    sendUsersListToAllUsers();
-                }
-
+            }
+            catch (IOException e) {
+                setupGUI.consoleLog(e.getMessage());
             }
         }
 
         private String sendRequestNameChange() throws IOException, ClassNotFoundException {
-            connection.send(new Message(MessageType.NAME_CHANGE));
-            Message messageWithName = connection.receive();
-            if(messageWithName.messageType.equals(MessageType.NAME_CHANGE)) {
-                this.name = messageWithName.message;
+            try {
+                connection.send(new Message(MessageType.NAME_CHANGE));
+                Message messageWithName = connection.receive();
+                if(messageWithName.messageType.equals(MessageType.NAME_CHANGE)) {
+                    this.name = messageWithName.message;
+                }
+
+            }
+            catch (IOException e) {
+                setupGUI.consoleLog(e.getMessage());
             }
             return this.name;
         }

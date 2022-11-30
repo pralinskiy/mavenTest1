@@ -1,4 +1,4 @@
-package graphics;
+package setup;
 
 import client.Client;
 import server.Server;
@@ -14,7 +14,7 @@ public final class SetupGUI extends JFrame{
     public Setup setup;
 
 
-    JTextArea console = new JTextArea();
+    public JTextArea console = new JTextArea();
 
 
     public SetupGUI() {
