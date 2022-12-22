@@ -49,12 +49,12 @@ public class ChatGUI extends JFrame implements KeyListener {
     }
     private void initBorders() {
         textOutput.setLineWrap(true);
-        textOutput.setBackground(Color.green);
+        textOutput.setBackground(Color.WHITE);
         textOutput.setEditable(false);
 
         usersList.setSize(200, this.HEIGHT);
         usersList.setLineWrap(true);
-        usersList.setBackground(Color.YELLOW);
+        usersList.setBackground(Color.WHITE);
         usersList.setEditable(false);
 
         panelSouth.add(textInput);
